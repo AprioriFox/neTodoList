@@ -14,7 +14,7 @@ class App extends React.Component{
             {label: 'Make Awesome App', important: true, id: 2, done: false},
             {label: 'Have a lunch', important: false, id: 3, done: true},
             {label: 'Drink vodka', important: false, id: 4, done: false},
-            {label: 'Pohmelitsa', important: false, id: 5, done: false}
+            {label: 'Pohmelitsa', important: false, id: 5, done: false},
         ],
         status: 'all',
     }
@@ -64,9 +64,7 @@ class App extends React.Component{
         })
     }
 
-
-
-    onToggleFilter = (status, act) => {
+    onToggleFilter = (status) => {
         this.setState({
             filter: status
         })
@@ -93,7 +91,7 @@ class App extends React.Component{
               <AppHeader toDo={todosTodo - doneTodos} done={doneTodos}/>
               <div className="top-panel d-flex">
                   <SearchPanel/>
-                  <ItemStatusFilter onToggleStatus = {this.onToggleFilter}/>
+                  <ItemStatusFilter filter = {this.state.filter} onToggleStatus = {this.onToggleFilter}/>
               </div>
 
               <TodoList onDelete= {this.onDelete}

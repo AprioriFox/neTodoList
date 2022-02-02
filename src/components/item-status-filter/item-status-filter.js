@@ -2,20 +2,28 @@ import React from 'react';
 
 import './item-status-filter.css';
 
-const ItemStatusFilter = ({onToggleStatus}) => {
-  return (
+const ItemStatusFilter = ({onToggleStatus, filter}) => {
+    const buttons = [
+        {name: 'all', label: 'All'},
+        {name: 'active', label: 'Active'},
+        {name: 'done', label: 'Done'},
+    ];
 
-    <div className="btn-group">
-      <button onClick={() => onToggleStatus('all')}
-              type="button"
-              className="btn btn-info">All</button>
-      <button onClick={() => onToggleStatus('active')}
-              type="button"
-              className="btn btn-outline-secondary">Active</button>
-      <button onClick={() => onToggleStatus('done')}
-              type="button"
-              className="btn btn-outline-secondary">Done</button>
-    </div>
+  return (
+      <div className="btn-group">
+          {buttons.map((btn) => {
+              const isActive = filter === btn.name
+              const name = isActive ? 'btn-info' : 'btn-outline-secondary'
+              return (
+                  <button onClick={(e) => {
+                      onToggleStatus(e.target.textContent.toLowerCase())
+                  }}
+                          key={btn.name}
+                          type="button"
+                          className={`btn ${name}`}>{btn.label}</button>
+              )
+          })}
+      </div>
   );
 };
 
