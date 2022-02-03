@@ -1,0 +1,33 @@
+.addForm {
+    margin-top: 10px;
+    padding: 5px 0;
+    display: flex;
+    width: 400px;
+    line-height: 1.5;
+}
+.addInput{
+    display: flex;
+    flex-grow: 1;
+    margin-right: 3px;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+.addBtn {
+    border-radius: 0.25rem;
+    border: 1px solid #6c757d;
+    color: #495057;
+    background-color: transparent;
+    cursor: pointer;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.addBtn:hover {
+    background-color: #6c757d;
+    color: #fff;
+ }

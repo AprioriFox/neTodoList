@@ -4,6 +4,8 @@ import AppHeader from '../app-header';
 import SearchPanel from '../search-panel';
 import TodoList from '../todo-list';
 import ItemStatusFilter from '../item-status-filter';
+import TodoAdd from "../todo-add";
+
 
 import './app.css';
 
@@ -17,6 +19,7 @@ class App extends React.Component{
             {label: 'Pohmelitsa', important: false, id: 5, done: false},
         ],
         status: 'all',
+        searchString: '',
     }
 
     onDelete = (id) => {
@@ -81,23 +84,53 @@ class App extends React.Component{
             return todos
         }
   }
+  onSearchFilter = (todos, searchString) =>{
+        const result = todos.filter(todo => todo.label.toLowerCase().includes(searchString))
+      return result;
+  }
 
+  onChangeSearchFilter = (searchText) => {
+    this.setState({
+        searchString: searchText
+    })
+  }
+  onAddTodo = (label)=>{
+    this.setState((oldState)=>{
+        const itemIDs = oldState.todos.map(item => item.id)
+        const maxID = Math.max(...itemIDs)
+
+        const newTodo = {
+            id: maxID+1,
+            label: label,
+            important: false,
+            done: false
+        }
+        return {
+            todos: [...oldState.todos, newTodo]
+        }
+    })
+  }
   render() {
         const filteredTodos = this.onStatusFilter(this.state.todos, this.state.filter)
+        const filteredTodosBySearch = this.onSearchFilter(filteredTodos, this.state.searchString)
+
+
+
         const doneTodos =  this.state.todos.filter((todo) => todo.done).length
         const todosTodo = this.state.todos.length
       return (
           <div className="todo-app">
               <AppHeader toDo={todosTodo - doneTodos} done={doneTodos}/>
               <div className="top-panel d-flex">
-                  <SearchPanel/>
+                  <SearchPanel onChangeSearchFilter = {this.onChangeSearchFilter}/>
                   <ItemStatusFilter filter = {this.state.filter} onToggleStatus = {this.onToggleFilter}/>
               </div>
 
               <TodoList onDelete= {this.onDelete}
                         onToggleImportant = {this.onToggleImportant}
                         onToggleDone = {this.onToggleDone}
-                        todos={filteredTodos}/>
+                        todos={filteredTodosBySearch}/>
+              <TodoAdd onAddTodo = {this.onAddTodo}/>
           </div>
       );
   };
