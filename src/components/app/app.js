@@ -1,66 +1,53 @@
- import React, {useState} from 'react';
+import React from 'react';
 
 import AppHeader from '../app-header';
 import SearchPanel from '../search-panel';
 import TodoList from '../todo-list';
 import ItemStatusFilter from '../item-status-filter';
+import TodoAdd from '../todo-add';
+import Login from '../login/login';
+import TodoApi from '../../services/todoApi';
 
 import './app.css';
 
-class App extends React.Component{
+class App extends React.Component {
     state = {
-        todos:[
-            {label: 'Drink Coffee', important: false, id: 1, done: false},
-            {label: 'Make Awesome App', important: true, id: 2, done: false},
-            {label: 'Have a lunch', important: false, id: 3, done: true},
-            {label: 'Drink vodka', important: false, id: 4, done: false},
-            {label: 'Pohmelitsa', important: false, id: 5, done: false},
-        ],
-        status: 'all',
+        todos: [],
+        filter: 'all',
+        searchString: '',
     }
 
-    onDelete = (id) => {
-        this.setState((oldState)=>{
-            const idx = oldState.todos.findIndex((item) => item.id === id)
+    credentials = localStorage.getItem('credentials')
 
-            const prev = oldState.todos.slice(0, idx)
-            const next = oldState.todos.slice(idx+1)
-
-            return {
-                todos: [...prev, ...next]
-            }
-        })
-    }
+    todoApi = new TodoApi();
 
     onToggleImportant = (id) => {
-        this.setState((oldState) => {
-            const idx = oldState.todos.findIndex((item) => item.id === id)
+        const idx = this.state.todos.findIndex((item) => item.id === id)
+        const old = this.state.todos[idx]
 
-            const prev = oldState.todos.slice(0, idx)
-            const current = oldState.todos[idx]
-            const next = oldState.todos.slice(idx + 1)
+        const newTodo = {
+            label: old.label,
+            important: !old.important,
+            done: old.done
+        }
 
-            return {
-                todos: [...prev,
-                    {...current, important: !current.important},
-                    ...next]
-            }
+        this.todoApi.updateTodo(old.id, newTodo).then(data =>{
+            this.onLoadTodos()
         })
     }
 
     onToggleDone = (id) => {
-        this.setState((prevState) => {
-            const idx = prevState.todos.findIndex((item) => item.id === id)
+        const idx = this.state.todos.findIndex((item) => item.id === id)
+        const old = this.state.todos[idx]
 
-            const prev = prevState.todos.slice(0, idx)
-            const current = prevState.todos[idx]
-            const next = prevState.todos.slice(idx + 1)
+        const newTodo = {
+            label: old.label,
+            important: old.important,
+            done: !old.done
+        }
 
-            return {
-                todos: [...prev,
-                    {...current, done: !current.done},
-                    ...next]
-            }
+        this.todoApi.updateTodo(old.id, newTodo).then(data =>{
+            this.onLoadTodos()
         })
     }
 
@@ -68,39 +55,101 @@ class App extends React.Component{
         this.setState({
             filter: status
         })
-  }
+    }
 
-
-  onStatusFilter =(todos, status) =>{
-        if ( status === 'active'){
+    onStatusFilter = (todos, status) => {
+        if (status === 'active') {
             return todos.filter((item) => item.done === false)
-        }
-        else if (status === 'done'){
+        } else if (status === 'done') {
             return todos.filter((item) => item.done === true)
         } else {
             return todos
         }
-  }
+    }
 
-  render() {
-        const filteredTodos = this.onStatusFilter(this.state.todos, this.state.filter)
-        const doneTodos =  this.state.todos.filter((todo) => todo.done).length
-        const todosTodo = this.state.todos.length
-      return (
-          <div className="todo-app">
-              <AppHeader toDo={todosTodo - doneTodos} done={doneTodos}/>
-              <div className="top-panel d-flex">
-                  <SearchPanel/>
-                  <ItemStatusFilter filter = {this.state.filter} onToggleStatus = {this.onToggleFilter}/>
-              </div>
+    onSearchFilter = (todos, searchString) => {
+        const result = todos.filter((todo) => todo.label.toLowerCase().includes(searchString.toLowerCase()))
+        return result
+    }
 
-              <TodoList onDelete= {this.onDelete}
-                        onToggleImportant = {this.onToggleImportant}
-                        onToggleDone = {this.onToggleDone}
-                        todos={filteredTodos}/>
-          </div>
-      );
-  };
+    onSearchChange = (searchString) => {
+        console.log(searchString)
+        this.setState({
+            searchString: searchString
+        })
+    }
+  
+    onLoadTodos = () =>{
+        this.todoApi.getTodos().then(todos =>{
+            this.setState({
+                todos:todos
+            })
+        })
+    }
+
+     addNewTodo = (label) => {
+        this.todoApi.createTodo(label).then(data =>{
+            this.onLoadTodos()
+        })
+    }
+
+    onDelete = (id) => {
+       this.todoApi.deleteTodo(id).then(data=>{
+           this.onLoadTodos()
+       })
+    }
+
+    componentDidMount() {
+        if (this.credentials){
+        this.onLoadTodos()
+    }
+    }
+
+    render() {
+        
+
+        if (this.credentials){
+
+
+        const filteredTodos = this.onStatusFilter(this.state.todos, this.state.filter);
+        const filterBySearchTodos = this.onSearchFilter(filteredTodos, this.state.searchString);
+
+        const doneTodos = this.state.todos.filter((obj) => {
+            return (obj.done === true)
+        })
+        const todo = this.state.todos.filter((obj) => {
+            return (obj.done === false)
+        })
+        return (
+            <div className="todo-app">
+                <AppHeader toDo={todo.length} done={doneTodos.length}/>
+
+                <div className="top-panel d-flex">
+
+                    <SearchPanel onSearchChange={this.onSearchChange}/>
+
+                    <ItemStatusFilter onToggleFilter={this.onToggleFilter} filter={this.state.filter}/>
+
+                </div>
+
+                
+                <TodoList
+                    onDelete={this.onDelete}
+                    onToggleImportant={this.onToggleImportant}
+                    onToggleDone={this.onToggleDone}
+                    todos={filterBySearchTodos}
+                />
+
+                <TodoAdd addNewTodo={this.addNewTodo}/>
+
+            </div>
+        );
+        } else{
+
+            return <Login />
+
+        }
+    }
 };
 
 export default App;
