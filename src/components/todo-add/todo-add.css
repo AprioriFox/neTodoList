@@ -1,0 +1,41 @@
+.form {
+    margin-bottom: 20px;
+}
+
+.form .add-input {
+    width: 315px;
+    margin-right: 5px;
+}
+
+.form .add-input:focus {
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    box-shadow: inset rgb(23,162,174) 0 0 1px 1px,
+    rgb(23,162,174) 0 0 4px 2px;
+    outline: none;
+    /*border-color .15s ease-in-out,box-shadow .15s ease-in-out*/
+}
+
+
+.form input {
+    border-radius: 3px;
+    border: 1px solid grey;
+    padding: 7px;
+}
+
+.form .btn-input {
+    width: 80px;
+}
+
+
+.form .btn-input:hover {
+    cursor: pointer;
+    background: rgb(59, 59, 59);
+    color: rgb(239, 239, 239);
+}
+.form .btn-input:active{
+    background: #17a2b8;
+    border: none;
+    box-shadow: inset rgb(23,162,174) 0 0 1px 1px,
+    rgb(23,162,174) 0 0 4px 2px;
+}
+
